@@ -4,9 +4,9 @@ using System.Collections;
 using System;
 
 
-public class SuperArray
+public class SuperArray : IEnumerable
 {
-    private int[] list;
+    private object[] list;
     private int count;
     public int Capacity
     { get { return list.Length; } }
@@ -14,56 +14,42 @@ public class SuperArray
     {
         get { return count; }
     }
+    public object this[int index]
+    {
+        get { return list[index]; }
+        set { list[index] = value; }    
+    }
     public SuperArray(int length =1)
     {
         count = 0;
-        list = new int[length];
+        list = new object[length];
     }
-    public void Add(int item)
+    public void Add(object item)
     {
-        if(count == list.Length)
+        if (count == list.Length)
         {
             Array.Resize(ref list, list.Length * 2);
         }
         list[count++] = item;
     }
-    public int Get(int index)
+    public object Get(int index)
     {
         if(index < 0  || index >= list.Length)  
             
             throw new IndexOutOfRangeException("index");
         return list[index];
     }
+    public void TrimExcess()
+    {
+        object[] temp = new object[count];
+        Array.Copy(list, temp, count); 
+        list = temp;
+    }
     public IEnumerator GetEnumerator()
     {
-        return new Enumerator(this);
-    }
-
-    private class Enumerator : IEnumerator
-    {
-        SuperArray list;
-        public Enumerator(SuperArray arr)
+        for(int i = 0; i <count; i++)
         {
-            list = arr;
-        }
-        public object Current
-        {
-            
-            get 
-            {
-                return list.list[index];
-            }
-        }
-        private int index =-1;
-        public bool MoveNext()
-        {
-            index++;
-            return index < list.count;
-        }
-        public void Reset()
-        {
-            throw new NotImplementedException();
+            yield return list[i];
         }
     }
-
 }
